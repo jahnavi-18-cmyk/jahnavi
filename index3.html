@@ -1,0 +1,81 @@
+
+<!-- Prompt 4: Binomial PMF Calculator -->
+
+<div class="panel">
+  <h2>Binomial PMF Calculator</h2>
+
+  <p>Calculate the probability of getting exactly k successes.</p>
+
+  <p>
+    <strong>Mathematical expression:</strong>
+    <br>
+    P(X = k) = C(n, k) p<sup>k</sup> (1 − p)<sup>n−k</sup>
+  </p>
+
+  <label for="pmfK">Number of successes (k)</label>
+  <input id="pmfK" type="number" min="0" step="1" value="7">
+
+  <button type="button" onclick="calculatePMF()">Calculate PMF</button>
+
+  <h3>Probability</h3>
+  <p id="pmfResult">Enter k and click Calculate PMF.</p>
+  <p id="pmfMeaning"></p>
+</div>
+
+<script>
+function calculatePMF() {
+  // Read n and p from the existing Binomial inputs
+  const nInput = document.getElementById("n");
+  const pInput = document.getElementById("p");
+  const kInput = document.getElementById("pmfK");
+
+  const n = Number(nInput.value);
+  const p = Number(pInput.value);
+  const k = Number(kInput.value);
+
+  const result = document.getElementById("pmfResult");
+  const meaning = document.getElementById("pmfMeaning");
+
+  if (
+    nInput.value.trim() === "" ||
+    pInput.value.trim() === "" ||
+    kInput.value.trim() === "" ||
+    !Number.isInteger(n) ||
+    n < 1 ||
+    !Number.isFinite(p) ||
+    p < 0 ||
+    p > 1 ||
+    !Number.isInteger(k) ||
+    k < 0 ||
+    k > n
+  ) {
+    result.textContent = "Invalid input. Ensure 0 ≤ k ≤ n.";
+    meaning.textContent = "";
+    return;
+  }
+
+  // Calculate C(n, k)
+  let combination = 1;
+  for (let i = 1; i <= Math.min(k, n - k); i++) {
+    combination *= (n - Math.min(k, n - k) + i) / i;
+  }
+
+  // Handle probability boundary cases safely
+  let probability;
+
+  if (p === 0) {
+    probability = k === 0 ? 1 : 0;
+  } else if (p === 1) {
+    probability = k === n ? 1 : 0;
+  } else {
+    probability =
+      combination * Math.pow(p, k) * Math.pow(1 - p, n - k);
+  }
+
+  result.textContent = "P(X = " + k + ") = " + probability.toFixed(6);
+
+  meaning.textContent =
+    "This is the probability of getting exactly " +
+    k + " successes in " + n + " independent trials.";
+}
+</script>
