@@ -1,0 +1,486 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Discrete Probability Distributions</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+header {
+    background: #172554;
+    color: white;
+    padding: 25px 15px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0 0 8px;
+}
+
+header p {
+    margin: 0;
+    color: #cbd5e1;
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    background: white;
+}
+
+nav button {
+    padding: 15px 24px;
+    border: none;
+    background: white;
+    color: #334155;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+nav button:hover,
+nav button.active {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+main {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 0 18px;
+}
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+.card {
+    background: white;
+    padding: 24px;
+    margin: 20px 0;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px #00000008;
+}
+
+h2 {
+    color: #172554;
+}
+
+label {
+    display: block;
+    margin: 18px 0 8px;
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+input:focus {
+    outline: 2px solid #93c5fd;
+}
+
+.error {
+    color: #b91c1c;
+    font-size: 14px;
+    margin-top: 7px;
+}
+
+.summary,
+.stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.value-box,
+.stat-card {
+    background: #f8fbff;
+    padding: 20px;
+    border: 1px solid #dbeafe;
+    border-radius: 9px;
+    min-width: 0;
+}
+
+.value-box span,
+.stat-card span {
+    display: block;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.value-box strong,
+.stat-card strong {
+    display: block;
+    margin-top: 12px;
+    font-size: 27px;
+    color: #1d4ed8;
+    overflow-wrap: anywhere;
+}
+
+.stat-card p {
+    margin-bottom: 0;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.status {
+    margin-top: 18px;
+    padding: 14px;
+    border-radius: 8px;
+    background: #eff6ff;
+    color: #1e40af;
+}
+
+.status.invalid {
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+.module {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 18px;
+    margin: 12px 0;
+}
+
+.module p {
+    color: #64748b;
+}
+
+.module button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 16px;
+    cursor: pointer;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    color: #64748b;
+    font-size: 13px;
+}
+
+@media (max-width: 500px) {
+    header h1 {
+        font-size: 23px;
+    }
+
+    nav button {
+        padding: 13px;
+        font-size: 14px;
+    }
+
+    .summary,
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .card {
+        padding: 17px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>Discrete Probability Distributions</h1>
+    <p>Undergraduate AIML Laboratory</p>
+</header>
+
+<nav>
+    <button class="active" data-page="home">Home</button>
+    <button data-page="binomial">Binomial</button>
+    <button data-page="poisson">Poisson</button>
+    <button data-page="geometric">Geometric</button>
+</nav>
+
+<main>
+
+    <!-- Home Page -->
+    <section id="home" class="page active">
+        <h2>Welcome to the Probability Lab</h2>
+        <p>
+            Explore discrete probability distributions
+            through interactive learning modules.
+        </p>
+
+        <div class="module">
+            <h3>Binomial Distribution</h3>
+            <p>Configure parameters and calculate distribution statistics.</p>
+            <button onclick="showPage('binomial')">
+                Open Binomial
+            </button>
+        </div>
+
+        <div class="module">
+            <h3>Poisson Distribution</h3>
+            <p>Coming soon.</p>
+        </div>
+
+        <div class="module">
+            <h3>Geometric Distribution</h3>
+            <p>Coming soon.</p>
+        </div>
+    </section>
+
+    <!-- Binomial Page -->
+    <section id="binomial" class="page">
+        <h2>Binomial Distribution</h2>
+        <p>Enter the parameters to calculate the distribution statistics.</p>
+
+        <div class="card">
+            <h3>Distribution Parameters</h3>
+
+            <label for="trials">Number of trials (n)</label>
+            <input type="number" id="trials"
+                   min="1" step="1" value="20">
+            <div id="nError" class="error" role="alert"></div>
+
+            <label for="probability">
+                Probability of success (p)
+            </label>
+            <input type="number" id="probability"
+                   min="0" max="1" step="any" value="0.35">
+            <div id="pError" class="error" role="alert"></div>
+        </div>
+
+        <div class="card">
+            <h3>Selected Parameters</h3>
+
+            <div class="summary">
+                <div class="value-box">
+                    <span>Number of trials (n)</span>
+                    <strong id="displayN">20</strong>
+                </div>
+
+                <div class="value-box">
+                    <span>Probability of success (p)</span>
+                    <strong id="displayP">0.35</strong>
+                </div>
+            </div>
+
+            <div id="status" class="status" role="status">
+                Parameter configuration is valid.
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="card">
+            <h3>Binomial Statistics</h3>
+            <p>Results update automatically when n or p changes.</p>
+
+            <div class="stats" id="statistics">
+
+                <div class="stat-card">
+                    <span>Mean E[X]</span>
+                    <strong id="mean">7.0000</strong>
+                    <p>np</p>
+                </div>
+
+                <div class="stat-card">
+                    <span>Variance Var(X)</span>
+                    <strong id="variance">4.5500</strong>
+                    <p>np(1-p)</p>
+                </div>
+
+                <div class="stat-card">
+                    <span>Standard Deviation</span>
+                    <strong id="stdDev">2.1331</strong>
+                    <p>Square root of variance</p>
+                </div>
+
+                <div class="stat-card">
+                    <span>Second Moment E[X²]</span>
+                    <strong id="secondMoment">53.5500</strong>
+                    <p>Variance + Mean²</p>
+                </div>
+
+                <div class="stat-card">
+                    <span>Skewness</span>
+                    <strong id="skewness">0.1406</strong>
+                    <p>(1-2p) / √Variance</p>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>About the Distribution</h3>
+            <p>
+                The binomial distribution models the number of successes
+                in a fixed number of independent trials, each with the
+                same probability of success.
+            </p>
+        </div>
+    </section>
+
+    <!-- Poisson Page -->
+    <section id="poisson" class="page">
+        <h2>Poisson Distribution</h2>
+        <div class="card">
+            <p>This module is coming soon.</p>
+        </div>
+    </section>
+
+    <!-- Geometric Page -->
+    <section id="geometric" class="page">
+        <h2>Geometric Distribution</h2>
+        <div class="card">
+            <p>This module is coming soon.</p>
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    AIML Laboratory | Discrete Probability Distributions
+</footer>
+
+<script>
+    // Navigation
+    function showPage(pageId) {
+        document.querySelectorAll(".page").forEach(page => {
+            page.classList.toggle("active", page.id === pageId);
+        });
+
+        document.querySelectorAll("nav button").forEach(button => {
+            button.classList.toggle(
+                "active",
+                button.dataset.page === pageId
+            );
+        });
+    }
+
+    document.querySelectorAll("nav button").forEach(button => {
+        button.addEventListener("click", () => {
+            showPage(button.dataset.page);
+        });
+    });
+
+    // Input elements
+    const trialsInput = document.getElementById("trials");
+    const probabilityInput = document.getElementById("probability");
+
+    function format(value) {
+        return Number.isFinite(value) ? value.toFixed(4) : "--";
+    }
+
+    // Validate parameters and calculate statistics
+    function validateAndCalculate() {
+        const nText = trialsInput.value.trim();
+        const pText = probabilityInput.value.trim();
+
+        const n = Number(nText);
+        const p = Number(pText);
+
+        const nValid =
+            nText !== "" &&
+            Number.isSafeInteger(n) &&
+            n > 0;
+
+        const pValid =
+            pText !== "" &&
+            Number.isFinite(p) &&
+            p >= 0 &&
+            p <= 1;
+
+        document.getElementById("nError").textContent =
+            nValid ? "" : "n must be a positive integer.";
+
+        document.getElementById("pError").textContent =
+            pValid ? "" :
+            "p must be between 0 and 1, inclusive.";
+
+        document.getElementById("displayN").textContent =
+            nValid ? n : "--";
+
+        document.getElementById("displayP").textContent =
+            pValid ? String(p) : "--";
+
+        const status = document.getElementById("status");
+        const statistics = document.getElementById("statistics");
+
+        if (!nValid || !pValid) {
+            status.textContent = "Please correct the invalid inputs.";
+            status.classList.add("invalid");
+            statistics.style.display = "none";
+            return;
+        }
+
+        status.textContent =
+            `Valid parameters: n = ${n}, p = ${p}.`;
+
+        status.classList.remove("invalid");
+        statistics.style.display = "grid";
+
+        // Mean = np
+        const mean = n * p;
+
+        // Variance = np(1-p)
+        const variance = n * p * (1 - p);
+
+        // Standard deviation = sqrt(variance)
+        const stdDev = Math.sqrt(variance);
+
+        // Second moment E[X²] = variance + mean²
+        const secondMoment = variance + mean ** 2;
+
+        // Skewness = (1-2p) / sqrt(np(1-p))
+        const skewness = variance === 0
+            ? NaN
+            : (1 - 2 * p) / stdDev;
+
+        document.getElementById("mean").textContent =
+            format(mean);
+
+        document.getElementById("variance").textContent =
+            format(variance);
+
+        document.getElementById("stdDev").textContent =
+            format(stdDev);
+
+        document.getElementById("secondMoment").textContent =
+            format(secondMoment);
+
+        document.getElementById("skewness").textContent =
+            format(skewness);
+    }
+
+    trialsInput.addEventListener("input", validateAndCalculate);
+    probabilityInput.addEventListener("input", validateAndCalculate);
+
+    // Initialize with n = 20 and p = 0.35
+    validateAndCalculate();
+</script>
+
+</body>
+</html>
