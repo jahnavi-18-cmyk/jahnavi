@@ -1,555 +1,200 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Binomial Statistics Calculator</title>
 
-<title>Discrete Probability Distributions Lab</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      color: #222;
+      padding: 25px;
+    }
 
-<style>
-* {
-  box-sizing: border-box;
-}
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 3px 12px #00000018;
+    }
 
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f3f6fb;
-  color: #243047;
-}
+    h1, h2 {
+      color: #234779;
+    }
 
-header {
-  background: #233b70;
-  color: white;
-  text-align: center;
-  padding: 25px 15px;
-}
+    label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 7px;
+      font-weight: bold;
+    }
 
-header h1 {
-  margin: 0 0 8px;
-}
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px;
+      font-size: 16px;
+      border: 1px solid #aaa;
+      border-radius: 6px;
+    }
 
-header p {
-  margin: 0;
-  color: #dce6ff;
-}
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      margin-top: 25px;
+    }
 
-nav {
-  background: white;
-  padding: 14px;
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  box-shadow: 0 2px 8px #00000010;
-}
+    .card {
+      background: #eef3fb;
+      border-left: 5px solid #2457a7;
+      padding: 18px;
+      border-radius: 8px;
+    }
 
-nav button {
-  padding: 11px 20px;
-  border: none;
-  border-radius: 7px;
-  background: #e7edfa;
-  color: #233b70;
-  cursor: pointer;
-  font-size: 15px;
-}
+    .card h3 {
+      margin-top: 0;
+      font-size: 16px;
+    }
 
-nav button.active,
-nav button:hover {
-  background: #233b70;
-  color: white;
-}
+    .value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #2457a7;
+      overflow-wrap: anywhere;
+    }
 
-main {
-  max-width: 1050px;
-  margin: 30px auto;
-  padding: 0 18px;
-}
-
-.panel {
-  background: white;
-  border-radius: 12px;
-  padding: 25px;
-  margin-bottom: 22px;
-  box-shadow: 0 4px 14px #1c315010;
-}
-
-h2 {
-  margin-top: 0;
-  color: #233b70;
-}
-
-.inputs {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-}
-
-label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 8px;
-}
-
-input {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #bdc9dc;
-  border-radius: 7px;
-  font-size: 16px;
-}
-
-input:focus {
-  outline: 2px solid #9cb8f5;
-}
-
-.selected {
-  background: #eef4ff;
-  border-left: 5px solid #4268b2;
-  padding: 16px;
-  border-radius: 6px;
-  line-height: 1.9;
-  overflow-wrap: anywhere;
-}
-
-.status {
-  margin-top: 12px;
-  font-weight: bold;
-}
-
-.valid {
-  color: #187647;
-}
-
-.invalid {
-  color: #c0392b;
-}
-
-.cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
-  gap: 15px;
-}
-
-.metric {
-  background: #f4f7ff;
-  border: 1px solid #dbe5fa;
-  padding: 18px;
-  border-radius: 10px;
-  overflow-wrap: anywhere;
-}
-
-.metric h3 {
-  margin: 0 0 12px;
-  font-size: 15px;
-  color: #536584;
-}
-
-.value {
-  font-size: 25px;
-  font-weight: bold;
-  color: #233b70;
-  margin-bottom: 10px;
-}
-
-.formula {
-  margin-top: 10px;
-  font-size: 13px;
-  color: #66748c;
-}
-
-.hidden {
-  display: none;
-}
-
-footer {
-  text-align: center;
-  color: #66748c;
-  padding: 20px;
-}
-
-@media (max-width: 500px) {
-  .panel {
-    padding: 18px;
-  }
-}
-</style>
+    #error {
+      color: #b3261e;
+      font-weight: bold;
+    }
+  </style>
 </head>
 
 <body>
+  <div class="container">
+    <h1>Binomial Statistics Calculator</h1>
 
-<header>
-  <h1>Discrete Probability Distributions</h1>
-  <p>Undergraduate AIML Laboratory</p>
-</header>
+    <p>
+      Enter the number of trials and probability of success
+      to calculate the statistical measures.
+    </p>
 
-<nav>
-  <button class="active" data-page="home">Home</button>
-  <button data-page="binomial">Binomial</button>
-  <button data-page="poisson">Poisson</button>
-  <button data-page="geometric">Geometric</button>
-</nav>
+    <label for="n">Number of trials (n)</label>
+    <input type="number" id="n" min="1" step="1" value="20">
 
-<main>
+    <label for="p">Probability of success (p)</label>
+    <input type="number" id="p" min="0" max="1"
+           step="any" value="0.35">
 
-  <!-- HOME -->
-  <section id="home" class="page">
-    <div class="panel">
-      <h2>Welcome to the Probability Distribution Lab</h2>
-      <p>
-        Explore discrete probability distributions and understand
-        their parameters, formulas, and statistical properties.
-      </p>
-      <p>
-        Select <strong>Binomial</strong> to enter parameters,
-        calculate statistical measures, and find probabilities.
-      </p>
-    </div>
-  </section>
+    <p id="error" role="alert"></p>
 
-  <!-- BINOMIAL -->
-  <section id="binomial" class="page hidden">
+    <h2>Statistical Results</h2>
 
-    <div class="panel">
-      <h2>Binomial Distribution</h2>
-      <p>
-        Configure the parameters of a binomial distribution.
-      </p>
-
-      <div class="inputs">
-        <div>
-          <label for="n">Number of trials (n)</label>
-          <input id="n" type="number" min="1"
-                 step="1" value="20">
-        </div>
-
-        <div>
-          <label for="p">Probability of success (p)</label>
-          <input id="p" type="number" min="0"
-                 max="1" step="0.01" value="0.35">
-        </div>
+    <div class="cards">
+      <div class="card">
+        <h3>Mean</h3>
+        <div class="value" id="mean">—</div>
+        <p>np</p>
       </div>
 
-      <p id="parameterStatus" class="status valid">
-        Parameter configuration is valid.
-      </p>
-    </div>
-
-    <!-- SELECTED PARAMETERS -->
-    <div class="panel">
-      <h2>Selected Parameters</h2>
-
-      <div class="selected">
-        <div>
-          Number of trials (n):
-          <strong id="selectedN">20</strong>
-        </div>
-
-        <div>
-          Probability of success (p):
-          <strong id="selectedP">0.35</strong>
-        </div>
-
-        <div id="parameterSummary">
-          Parameter configuration is valid. n = 20, p = 0.35.
-        </div>
-      </div>
-    </div>
-
-    <!-- ABOUT -->
-    <div class="panel">
-      <h2>About the Distribution</h2>
-      <p>
-        The binomial distribution models the number of successes
-        in a fixed number of independent trials, where each trial
-        has the same probability of success.
-      </p>
-    </div>
-
-    <!-- STATISTICAL MEASURES -->
-    <div class="panel">
-      <h2>Statistical Measures</h2>
-
-      <div class="cards">
-
-        <div class="metric">
-          <h3>Mean</h3>
-          <div class="value" id="mean">7.0000</div>
-          <div class="formula">μ = np</div>
-        </div>
-
-        <div class="metric">
-          <h3>Variance</h3>
-          <div class="value" id="variance">4.5500</div>
-          <div class="formula">σ² = np(1 − p)</div>
-        </div>
-
-        <div class="metric">
-          <h3>Standard Deviation</h3>
-          <div class="value" id="sd">2.1331</div>
-          <div class="formula">σ = √(np(1 − p))</div>
-        </div>
-
-        <div class="metric">
-          <h3>Second Moment E[X²]</h3>
-          <div class="value" id="second">53.5500</div>
-          <div class="formula">E[X²] = σ² + μ²</div>
-        </div>
-
-        <div class="metric">
-          <h3>Skewness</h3>
-          <div class="value" id="skewness">0.1406</div>
-          <div class="formula">
-            (1 − 2p) / √(np(1 − p))
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- PMF CALCULATOR -->
-    <div class="panel">
-      <h2>Binomial PMF Calculator</h2>
-
-      <p>
-        Calculate the probability of getting exactly k successes
-        in n independent trials.
-      </p>
-
-      <div class="inputs">
-        <div>
-          <label for="k">Number of successes (k)</label>
-          <input id="k" type="number" min="0"
-                 step="1" value="7">
-        </div>
+      <div class="card">
+        <h3>Variance</h3>
+        <div class="value" id="variance">—</div>
+        <p>np(1 − p)</p>
       </div>
 
-      <p><strong>Mathematical expression:</strong></p>
-
-      <div class="selected">
-        P(X = k) = C(n, k) p<sup>k</sup>
-        (1 − p)<sup>n−k</sup>
+      <div class="card">
+        <h3>Standard Deviation</h3>
+        <div class="value" id="sd">—</div>
+        <p>√Variance</p>
       </div>
 
-      <h3>Calculated Probability</h3>
-
-      <div class="metric">
-        <div class="value" id="pmfResult">0.184385</div>
-        <div id="pmfExplanation">
-          This is the probability of getting exactly 7 successes
-          in 20 trials.
-        </div>
+      <div class="card">
+        <h3>Second Moment E[X²]</h3>
+        <div class="value" id="secondMoment">—</div>
+        <p>Variance + Mean²</p>
       </div>
 
-      <p id="pmfStatus" class="status valid">
-        Probability calculated successfully.
-      </p>
+      <div class="card">
+        <h3>Skewness</h3>
+        <div class="value" id="skewness">—</div>
+        <p>(1 − 2p) / √(np(1 − p))</p>
+      </div>
     </div>
+  </div>
 
-  </section>
+  <script>
+    function calculateStatistics() {
+      const nText = document.getElementById("n").value.trim();
+      const pText = document.getElementById("p").value.trim();
 
-  <!-- POISSON PLACEHOLDER -->
-  <section id="poisson" class="page hidden">
-    <div class="panel">
-      <h2>Poisson Distribution</h2>
-      <p>This section is coming soon.</p>
-    </div>
-  </section>
+      const n = Number(nText);
+      const p = Number(pText);
+      const error = document.getElementById("error");
 
-  <!-- GEOMETRIC PLACEHOLDER -->
-  <section id="geometric" class="page hidden">
-    <div class="panel">
-      <h2>Geometric Distribution</h2>
-      <p>This section is coming soon.</p>
-    </div>
-  </section>
+      if (nText === "" || !Number.isInteger(n) || n < 1) {
+        error.textContent = "n must be a positive integer.";
+        clearResults();
+        return;
+      }
 
-</main>
+      if (pText === "" || !Number.isFinite(p) || p < 0 || p > 1) {
+        error.textContent = "p must be between 0 and 1.";
+        clearResults();
+        return;
+      }
 
-<footer>
-  Discrete Probability Distributions Lab
-</footer>
+      error.textContent = "";
 
-<script>
-const nInput = document.getElementById("n");
-const pInput = document.getElementById("p");
-const kInput = document.getElementById("k");
+      const mean = n * p;
+      const variance = n * p * (1 - p);
+      const standardDeviation = Math.sqrt(variance);
+      const secondMoment = variance + mean * mean;
 
-// NAVIGATION
-document.querySelectorAll("nav button").forEach(button => {
-  button.addEventListener("click", () => {
-    const target = button.dataset.page;
+      // Skewness is undefined when variance is zero.
+      const skewness = variance === 0
+        ? null
+        : (1 - 2 * p) / standardDeviation;
 
-    document.querySelectorAll(".page").forEach(page => {
-      page.classList.toggle("hidden", page.id !== target);
-    });
+      document.getElementById("mean").textContent =
+        mean.toFixed(4);
 
-    document.querySelectorAll("nav button").forEach(item => {
-      item.classList.toggle("active", item === button);
-    });
-  });
-});
+      document.getElementById("variance").textContent =
+        variance.toFixed(4);
 
-// COMBINATION: C(n, k)
-function combination(n, k) {
-  if (k < 0 || k > n) return 0;
+      document.getElementById("sd").textContent =
+        standardDeviation.toFixed(4);
 
-  const r = Math.min(k, n - k);
-  let result = 1;
+      document.getElementById("secondMoment").textContent =
+        secondMoment.toFixed(4);
 
-  for (let i = 1; i <= r; i++) {
-    result *= (n - r + i) / i;
-  }
+      document.getElementById("skewness").textContent =
+        skewness === null ? "Undefined" : skewness.toFixed(4);
+    }
 
-  return result;
-}
+    function clearResults() {
+      ["mean", "variance", "sd", "secondMoment", "skewness"]
+        .forEach(function(id) {
+          document.getElementById(id).textContent = "—";
+        });
+    }
 
-// UPDATE ALL BINOMIAL CALCULATIONS
-function updateBinomial() {
-  const nText = nInput.value.trim();
-  const pText = pInput.value.trim();
+    document.getElementById("n").addEventListener(
+      "input", calculateStatistics
+    );
 
-  const n = Number(nText);
-  const p = Number(pText);
+    document.getElementById("p").addEventListener(
+      "input", calculateStatistics
+    );
 
-  const validN =
-    nText !== "" &&
-    Number.isSafeInteger(n) &&
-    n >= 1;
-
-  const validP =
-    pText !== "" &&
-    Number.isFinite(p) &&
-    p >= 0 &&
-    p <= 1;
-
-  document.getElementById("selectedN").textContent =
-    nText === "" ? "—" : nText;
-
-  document.getElementById("selectedP").textContent =
-    pText === "" ? "—" : pText;
-
-  const parameterStatus =
-    document.getElementById("parameterStatus");
-
-  const parameterSummary =
-    document.getElementById("parameterSummary");
-
-  if (!validN || !validP) {
-    parameterStatus.textContent =
-      "Invalid input. n must be a positive integer and p must be between 0 and 1.";
-    parameterStatus.className = "status invalid";
-    parameterSummary.textContent =
-      "Please correct the parameter values.";
-
-    ["mean", "variance", "sd", "second", "skewness"]
-      .forEach(id => {
-        document.getElementById(id).textContent = "—";
-      });
-
-    updatePMF();
-    return;
-  }
-
-  parameterStatus.textContent =
-    "Parameter configuration is valid.";
-  parameterStatus.className = "status valid";
-
-  parameterSummary.textContent =
-    `Parameter configuration is valid. n = ${n}, p = ${p}.`;
-
-  const mean = n * p;
-  const variance = n * p * (1 - p);
-  const sd = Math.sqrt(variance);
-  const second = variance + mean * mean;
-  const skewness =
-    variance === 0 ? null : (1 - 2 * p) / sd;
-
-  const format = value => value.toFixed(4);
-
-  document.getElementById("mean").textContent =
-    format(mean);
-
-  document.getElementById("variance").textContent =
-    format(variance);
-
-  document.getElementById("sd").textContent =
-    format(sd);
-
-  document.getElementById("second").textContent =
-    format(second);
-
-  document.getElementById("skewness").textContent =
-    skewness === null ? "—" : format(skewness);
-
-  updatePMF();
-}
-
-// CALCULATE BINOMIAL PMF
-function updatePMF() {
-  const nText = nInput.value.trim();
-  const pText = pInput.value.trim();
-  const kText = kInput.value.trim();
-
-  const n = Number(nText);
-  const p = Number(pText);
-  const k = Number(kText);
-
-  const result = document.getElementById("pmfResult");
-  const explanation =
-    document.getElementById("pmfExplanation");
-  const status = document.getElementById("pmfStatus");
-
-  const validN =
-    nText !== "" &&
-    Number.isSafeInteger(n) &&
-    n >= 1;
-
-  const validP =
-    pText !== "" &&
-    Number.isFinite(p) &&
-    p >= 0 &&
-    p <= 1;
-
-  const validK =
-    kText !== "" &&
-    Number.isSafeInteger(k) &&
-    k >= 0 &&
-    k <= n;
-
-  if (!validN || !validP || !validK) {
-    result.textContent = "—";
-    explanation.textContent =
-      "Enter valid parameters to calculate the probability.";
-    status.textContent =
-      "Ensure n ≥ 1, 0 ≤ p ≤ 1, and integer k satisfies 0 ≤ k ≤ n.";
-    status.className = "status invalid";
-    return;
-  }
-
-  const probability =
-    combination(n, k) *
-    Math.pow(p, k) *
-    Math.pow(1 - p, n - k);
-
-  result.textContent = probability.toFixed(6);
-
-  explanation.textContent =
-    `This is the probability of getting exactly ${k} successes in ${n} trials.`;
-
-  status.textContent =
-    "Probability calculated successfully.";
-  status.className = "status valid";
-}
-
-// LIVE INPUT UPDATES
-nInput.addEventListener("input", updateBinomial);
-pInput.addEventListener("input", updateBinomial);
-kInput.addEventListener("input", updatePMF);
-
-// INITIAL CALCULATION
-updateBinomial();
-</script>
-
+    // Calculate the default values when the page opens.
+    calculateStatistics();
+  </script>
 </body>
 </html>
