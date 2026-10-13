@@ -1,81 +1,212 @@
 
-<!-- Prompt 4: Binomial PMF Calculator -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Binomial PMF Calculator</title>
 
-<div class="panel">
-  <h2>Binomial PMF Calculator</h2>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 30px 15px;
+      color: #222;
+    }
 
-  <p>Calculate the probability of getting exactly k successes.</p>
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 3px 12px #00000018;
+    }
 
-  <p>
-    <strong>Mathematical expression:</strong>
-    <br>
-    P(X = k) = C(n, k) p<sup>k</sup> (1 − p)<sup>n−k</sup>
-  </p>
+    h1 {
+      color: #243b64;
+      font-size: 28px;
+    }
 
-  <label for="pmfK">Number of successes (k)</label>
-  <input id="pmfK" type="number" min="0" step="1" value="7">
+    label {
+      display: block;
+      margin-top: 18px;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
 
-  <button type="button" onclick="calculatePMF()">Calculate PMF</button>
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      border: 1px solid #aaa;
+      border-radius: 6px;
+      font-size: 16px;
+    }
 
-  <h3>Probability</h3>
-  <p id="pmfResult">Enter k and click Calculate PMF.</p>
-  <p id="pmfMeaning"></p>
-</div>
+    button {
+      margin-top: 18px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      background: #2457a7;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
 
-<script>
-function calculatePMF() {
-  // Read n and p from the existing Binomial inputs
-  const nInput = document.getElementById("n");
-  const pInput = document.getElementById("p");
-  const kInput = document.getElementById("pmfK");
+    button:hover {
+      background: #173e7b;
+    }
 
-  const n = Number(nInput.value);
-  const p = Number(pInput.value);
-  const k = Number(kInput.value);
+    .formula {
+      background: #f0f4fb;
+      padding: 15px;
+      border-radius: 6px;
+      font-size: 18px;
+      line-height: 1.8;
+    }
 
-  const result = document.getElementById("pmfResult");
-  const meaning = document.getElementById("pmfMeaning");
+    .result {
+      margin-top: 22px;
+      padding: 16px;
+      background: #e8f5e9;
+      border-radius: 8px;
+    }
 
-  if (
-    nInput.value.trim() === "" ||
-    pInput.value.trim() === "" ||
-    kInput.value.trim() === "" ||
-    !Number.isInteger(n) ||
-    n < 1 ||
-    !Number.isFinite(p) ||
-    p < 0 ||
-    p > 1 ||
-    !Number.isInteger(k) ||
-    k < 0 ||
-    k > n
-  ) {
-    result.textContent = "Invalid input. Ensure 0 ≤ k ≤ n.";
-    meaning.textContent = "";
-    return;
-  }
+    #probability {
+      font-size: 23px;
+      font-weight: bold;
+      color: #17652a;
+      overflow-wrap: anywhere;
+    }
 
-  // Calculate C(n, k)
-  let combination = 1;
-  for (let i = 1; i <= Math.min(k, n - k); i++) {
-    combination *= (n - Math.min(k, n - k) + i) / i;
-  }
+    #message {
+      color: #b3261e;
+      margin-top: 12px;
+    }
 
-  // Handle probability boundary cases safely
-  let probability;
+    .meaning {
+      line-height: 1.6;
+    }
+  </style>
+</head>
 
-  if (p === 0) {
-    probability = k === 0 ? 1 : 0;
-  } else if (p === 1) {
-    probability = k === n ? 1 : 0;
-  } else {
-    probability =
-      combination * Math.pow(p, k) * Math.pow(1 - p, n - k);
-  }
+<body>
+  <div class="container">
+    <h1>Binomial PMF Calculator</h1>
 
-  result.textContent = "P(X = " + k + ") = " + probability.toFixed(6);
+    <p>
+      Calculate the probability of getting exactly k successes
+      in a fixed number of independent trials.
+    </p>
 
-  meaning.textContent =
-    "This is the probability of getting exactly " +
-    k + " successes in " + n + " independent trials.";
-}
-</script>
+    <label for="n">Number of trials (n)</label>
+    <input id="n" type="number" min="1" step="1" value="20">
+
+    <label for="p">Probability of success (p)</label>
+    <input id="p" type="number" min="0" max="1"
+           step="any" value="0.35">
+
+    <label for="k">Number of successes (k)</label>
+    <input id="k" type="number" min="0" step="1" value="7">
+
+    <h3>Mathematical Expression</h3>
+
+    <div class="formula">
+      X ~ Binomial(n, p)
+      <br>
+      P(X = k) = C(n, k) p<sup>k</sup> (1 − p)<sup>n−k</sup>
+    </div>
+
+    <button id="calculateButton" type="button">
+      Calculate PMF
+    </button>
+
+    <p id="message" role="alert"></p>
+
+    <div class="result" aria-live="polite">
+      <h3>Probability Result</h3>
+      <p id="probability">Click Calculate PMF to see the result.</p>
+      <p id="meaning" class="meaning"></p>
+    </div>
+  </div>
+
+  <script>
+    function combination(n, k) {
+      k = Math.min(k, n - k);
+
+      let result = 1;
+
+      for (let i = 1; i <= k; i++) {
+        result = result * (n - k + i) / i;
+      }
+
+      return result;
+    }
+
+    function calculatePMF() {
+      const nText = document.getElementById("n").value.trim();
+      const pText = document.getElementById("p").value.trim();
+      const kText = document.getElementById("k").value.trim();
+
+      const n = Number(nText);
+      const p = Number(pText);
+      const k = Number(kText);
+
+      const message = document.getElementById("message");
+      const probabilityOutput = document.getElementById("probability");
+      const meaningOutput = document.getElementById("meaning");
+
+      message.textContent = "";
+      meaningOutput.textContent = "";
+
+      if (nText === "" || !Number.isInteger(n) || n < 1) {
+        message.textContent =
+          "Invalid input: n must be a positive integer.";
+        return;
+      }
+
+      if (pText === "" || !Number.isFinite(p) || p < 0 || p > 1) {
+        message.textContent =
+          "Invalid input: p must be between 0 and 1.";
+        return;
+      }
+
+      if (kText === "" || !Number.isInteger(k) || k < 0 || k > n) {
+        message.textContent =
+          "Invalid input: k must be an integer between 0 and n.";
+        return;
+      }
+
+      let probability;
+
+      if (p === 0) {
+        probability = (k === 0) ? 1 : 0;
+      } else if (p === 1) {
+        probability = (k === n) ? 1 : 0;
+      } else {
+        probability =
+          combination(n, k) *
+          Math.pow(p, k) *
+          Math.pow(1 - p, n - k);
+      }
+
+      probabilityOutput.textContent =
+        "P(X = " + k + ") = " + probability.toFixed(6);
+
+      meaningOutput.textContent =
+        "This is the probability of getting exactly " +
+        k + " successes in " + n + " independent trials.";
+    }
+
+    document.getElementById("calculateButton")
+      .addEventListener("click", calculatePMF);
+
+    // Calculate the default example when the page loads.
+    calculatePMF();
+  </script>
+</body>
+</html>
+
