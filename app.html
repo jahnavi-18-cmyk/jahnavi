@@ -1,0 +1,429 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Discrete Probability Distributions</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f6fb;color:#222}
+header{background:#fff;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+nav button,button{padding:10px 15px;border:0;border-radius:6px;cursor:pointer;background:#3157c8;color:white}
+nav button{background:#eee;color:#333}
+nav button.active{background:#3157c8;color:white}
+main{max-width:1100px;margin:25px auto;padding:0 18px}
+.card{background:white;padding:20px;border-radius:10px;margin-bottom:18px;box-shadow:0 2px 8px #0000000c}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.stat{background:#edf1ff;padding:15px;border-radius:8px;overflow-wrap:anywhere}
+.stat strong{display:block;font-size:21px;color:#3157c8;margin-top:8px}
+label{display:block;font-weight:bold;margin-bottom:7px}
+input{width:100%;padding:10px;border:1px solid #bbb;border-radius:6px;font-size:16px}
+.result{background:#edf1ff;padding:14px;border-radius:8px;margin-top:12px}
+.result strong{display:block;font-size:21px;color:#2342a4;margin-top:6px;overflow-wrap:anywhere}
+.formula,.note{background:#f6f7fb;padding:12px;border-radius:6px;margin-top:12px}
+.error{color:#c62828}
+.chart{height:360px;position:relative}
+h1{margin-bottom:6px}
+.muted{color:#667085;line-height:1.5}
+[hidden]{display:none!important}
+@media(max-width:650px){.grid{grid-template-columns:1fr}header{padding:15px}.chart{height:300px}}
+</style>
+</head>
+<body>
+
+<header>
+  <strong>Discrete Probability Distributions</strong>
+  <nav>
+    <button data-page="home">Home</button>
+    <button data-page="binomial" class="active">Binomial</button>
+    <button data-page="poisson">Poisson</button>
+    <button data-page="geometric">Geometric</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- HOME -->
+<section id="home" hidden>
+  <h1>Discrete Probability Distributions</h1>
+  <div class="card">
+    <p>Choose a distribution from the navigation menu.</p>
+    <p>Binomial and Poisson modules are functional.</p>
+    <p>Geometric module is reserved for a future update.</p>
+  </div>
+</section>
+
+<!-- BINOMIAL -->
+<section id="binomial">
+  <h1>Binomial Distribution</h1>
+  <p class="muted">Enter n, p and k to calculate binomial probabilities.</p>
+
+  <div class="card">
+    <h2>1. Inputs</h2>
+    <div class="grid">
+      <div>
+        <label for="bn">Number of trials (n)</label>
+        <input id="bn" type="number" min="1" step="1" value="20">
+      </div>
+      <div>
+        <label for="bp">Probability of success (p)</label>
+        <input id="bp" type="number" min="0" max="1" step="any" value="0.35">
+      </div>
+      <div>
+        <label for="bk">Number of successes (k)</label>
+        <input id="bk" type="number" min="0" step="1" value="7">
+      </div>
+    </div>
+    <p id="bselected" class="muted"></p>
+    <p id="berror" class="error"></p>
+  </div>
+
+  <div class="card">
+    <h2>2. Statistics</h2>
+    <div class="stats">
+      <div class="stat">Mean (np)<strong id="bmean">—</strong></div>
+      <div class="stat">Variance<strong id="bvar">—</strong></div>
+      <div class="stat">Standard deviation<strong id="bsd">—</strong></div>
+      <div class="stat">Second moment E[X²]<strong id="bsecond">—</strong></div>
+      <div class="stat">Skewness<strong id="bskew">—</strong></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>3. PMF</h2>
+      <div class="formula">
+        P(X=k) = C(n,k) p<sup>k</sup>(1-p)<sup>n-k</sup>
+      </div>
+      <div class="result">P(X = k)<strong id="bpmf">—</strong></div>
+      <p id="bmeaning" class="muted"></p>
+    </div>
+    <div class="card">
+      <h2>4. CDF</h2>
+      <div class="result">P(X ≤ k)<strong id="bcdf">—</strong></div>
+      <div class="result">P(X > k)<strong id="bupper">—</strong></div>
+      <p class="muted">P(X ≤ k) means the probability of getting k or fewer successes.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>5. Binomial PMF Graph</h2>
+    <p class="muted">Hover over a bar to see its probability. The dashed line marks the mean.</p>
+    <div class="chart"><canvas id="bchart"></canvas></div>
+  </div>
+</section>
+
+<!-- POISSON -->
+<section id="poisson" hidden>
+  <h1>Poisson Distribution</h1>
+  <p class="muted">Model the number of events occurring at an average rate λ.</p>
+
+  <div class="card">
+    <h2>1. Inputs</h2>
+    <div class="grid">
+      <div>
+        <label for="pl">Average event rate (λ)</label>
+        <input id="pl" type="number" min="0" step="any" value="6">
+      </div>
+      <div>
+        <label for="pk">Number of events (k)</label>
+        <input id="pk" type="number" min="0" step="1" value="8">
+      </div>
+    </div>
+    <p id="pselected" class="muted"></p>
+    <p id="perror" class="error"></p>
+  </div>
+
+  <div class="card">
+    <h2>2. Statistics</h2>
+    <div class="stats">
+      <div class="stat">Mean (λ)<strong id="pmean">—</strong></div>
+      <div class="stat">Variance (λ)<strong id="pvar">—</strong></div>
+      <div class="stat">Standard deviation<strong id="psd">—</strong></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>3. PMF</h2>
+      <div class="formula">P(X=k) = e<sup>-λ</sup> λ<sup>k</sup> / k!</div>
+      <div class="result">P(X = k)<strong id="ppmf">—</strong></div>
+      <p class="muted">This is the probability of observing exactly k events.</p>
+    </div>
+    <div class="card">
+      <h2>4. CDF</h2>
+      <div class="result">P(X ≤ k)<strong id="pcdf">—</strong></div>
+      <div class="result">P(X > k)<strong id="pupper">—</strong></div>
+      <p class="muted">P(X ≤ k) is the probability of observing k or fewer events.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>5. Poisson PMF Graph</h2>
+    <p class="muted">The graph updates automatically when λ changes.</p>
+    <div class="chart"><canvas id="pchart"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h2>6. Compare λ = 2, 6 and 10</h2>
+    <p class="muted">Compare how the event rate changes the shape and spread of the distribution.</p>
+    <div class="chart"><canvas id="compareChart"></canvas></div>
+    <p id="comparison" class="note"></p>
+  </div>
+</section>
+
+<!-- GEOMETRIC PLACEHOLDER -->
+<section id="geometric" hidden>
+  <div class="card">
+    <h1>Geometric Distribution</h1>
+    <p class="muted">This module will be implemented in a future update.</p>
+  </div>
+</section>
+
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const charts = {};
+
+function fmt(x, digits=8) {
+  if (!Number.isFinite(x)) return "—";
+  return x.toLocaleString("en-US",{maximumFractionDigits:digits});
+}
+
+/* Stable binomial PMF calculation */
+function binomPMF(n,k,p) {
+  if(k<0 || k>n) return 0;
+  if(p===0) return k===0 ? 1 : 0;
+  if(p===1) return k===n ? 1 : 0;
+
+  let logC=0;
+  for(let i=1;i<=Math.min(k,n-k);i++){
+    logC += Math.log(n-Math.min(k,n-k)+i)-Math.log(i);
+  }
+  const logP=logC+k*Math.log(p)+(n-k)*Math.log1p(-p);
+  return Math.exp(logP);
+}
+
+function poissonPMF(lambda,k) {
+  if(lambda===0) return k===0 ? 1 : 0;
+  let logFactorial=0;
+  for(let i=2;i<=k;i++) logFactorial+=Math.log(i);
+  return Math.exp(-lambda+k*Math.log(lambda)-logFactorial);
+}
+
+/* Chart plugin: vertical mean reference line */
+const meanLinePlugin = {
+  id:"meanLine",
+  afterDatasetsDraw(chart,args,opts) {
+    if(opts.mean===undefined || !chart.chartArea) return;
+    const {ctx,chartArea,scales}=chart;
+    const x=scales.x.getPixelForValue(opts.mean);
+    ctx.save();
+    ctx.setLineDash([7,5]);
+    ctx.strokeStyle="#d35400";
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.moveTo(x,chartArea.top);
+    ctx.lineTo(x,chartArea.bottom);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle="#d35400";
+    ctx.font="12px Arial";
+    ctx.fillText("Mean = "+opts.mean.toFixed(2),
+      Math.min(x+5,chartArea.right-90),chartArea.top+15);
+    ctx.restore();
+  }
+};
+
+function makeChart(id, labels, datasets, xTitle, mean) {
+  if(charts[id]) charts[id].destroy();
+
+  charts[id]=new Chart($(id),{
+    type:"bar",
+    data:{labels,datasets},
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{display:datasets.length>1},
+        meanLine:{mean},
+        tooltip:{
+          callbacks:{
+            title:items=>"X = "+items[0].label,
+            label:item=>item.dataset.label+": "+Number(item.raw).toPrecision(7)
+          }
+        }
+      },
+      scales:{
+        x:{
+          title:{display:true,text:xTitle},
+          ticks:{autoSkip:true,maxTicksLimit:25}
+        },
+        y:{
+          beginAtZero:true,
+          title:{display:true,text:"Probability P(X)"}
+        }
+      }
+    },
+    plugins: mean===undefined ? [] : [meanLinePlugin]
+  });
+}
+
+/* BINOMIAL MODULE */
+function updateBinomial() {
+  const n=Number($("bn").value);
+  const p=Number($("bp").value);
+  const k=Number($("bk").value);
+
+  let err="";
+  if($("bn").value.trim()==="" || !Number.isInteger(n) || n<1)
+    err="n must be a positive integer.";
+  else if(n>1000)
+    err="For performance, n must not exceed 1000.";
+  else if($("bp").value.trim()==="" || !Number.isFinite(p) || p<0 || p>1)
+    err="p must be between 0 and 1, inclusive.";
+  else if($("bk").value.trim()==="" || !Number.isInteger(k) || k<0 || k>n)
+    err="k must be an integer between 0 and n.";
+
+  $("berror").textContent=err;
+  if(err) return;
+
+  $("bselected").textContent=`Selected values: n = ${n}, p = ${p}, k = ${k}`;
+
+  const mean=n*p;
+  const variance=n*p*(1-p);
+  const sd=Math.sqrt(variance);
+  const second=variance+mean*mean;
+  const skew=variance===0 ? 0 : (1-2*p)/sd;
+
+  $("bmean").textContent=fmt(mean);
+  $("bvar").textContent=fmt(variance);
+  $("bsd").textContent=fmt(sd);
+  $("bsecond").textContent=fmt(second);
+  $("bskew").textContent=fmt(skew);
+
+  const pmf=binomPMF(n,k,p);
+  let cdf=0;
+  for(let x=0;x<=k;x++) cdf+=binomPMF(n,x,p);
+  cdf=Math.min(1,cdf);
+
+  $("bpmf").textContent=fmt(pmf,12);
+  $("bcdf").textContent=fmt(cdf,12);
+  $("bupper").textContent=fmt(Math.max(0,1-cdf),12);
+  $("bmeaning").textContent=`Probability of exactly ${k} successes in ${n} trials.`;
+
+  const labels=Array.from({length:n+1},(_,x)=>x);
+  const values=labels.map(x=>binomPMF(n,x,p));
+
+  makeChart("bchart",labels,[{
+    label:"P(X = x)",data:values,
+    backgroundColor:"rgba(49,87,200,.75)",
+    borderColor:"#3157c8",borderWidth:1
+  }],"Number of successes X",mean);
+}
+
+/* POISSON MODULE */
+function updatePoisson() {
+  const lambda=Number($("pl").value);
+  const k=Number($("pk").value);
+
+  let err="";
+  if($("pl").value.trim()==="" || !Number.isFinite(lambda) || lambda<0 || lambda>500)
+    err="λ must be between 0 and 500.";
+  else if($("pk").value.trim()==="" || !Number.isInteger(k) || k<0 || k>1000)
+    err="k must be an integer between 0 and 1000.";
+
+  $("perror").textContent=err;
+  if(err) return;
+
+  $("pselected").textContent=`Selected values: λ = ${lambda}, k = ${k}`;
+
+  $("pmean").textContent=fmt(lambda);
+  $("pvar").textContent=fmt(lambda);
+  $("psd").textContent=fmt(Math.sqrt(lambda));
+
+  const pmf=poissonPMF(lambda,k);
+  let cdf=0;
+  for(let x=0;x<=k;x++) cdf+=poissonPMF(lambda,x);
+
+  $("ppmf").textContent=fmt(pmf,12);
+  $("pcdf").textContent=fmt(Math.min(1,cdf),12);
+  $("pupper").textContent=fmt(Math.max(0,1-cdf),12);
+
+  const maxX=Math.min(1000,Math.max(
+    k,Math.ceil(lambda+6*Math.sqrt(lambda+1)),15
+  ));
+  const labels=Array.from({length:maxX+1},(_,x)=>x);
+  const values=labels.map(x=>poissonPMF(lambda,x));
+
+  makeChart("pchart",labels,[{
+    label:`λ = ${lambda}`,data:values,
+    backgroundColor:"rgba(49,87,200,.75)",
+    borderColor:"#3157c8",borderWidth:1
+  }],"Number of events X",lambda);
+
+  updateComparison();
+}
+
+/* Compare three Poisson rates */
+function updateComparison() {
+  const rates=[2,6,10];
+  const maxX=30;
+  const labels=Array.from({length:maxX+1},(_,x)=>x);
+  const colors=["#3157c8","#159570","#e07a22"];
+
+  const datasets=rates.map((rate,i)=>({
+    label:`λ = ${rate}`,
+    data:labels.map(x=>poissonPMF(rate,x)),
+    backgroundColor:colors[i],
+    borderColor:colors[i],
+    borderWidth:1
+  }));
+
+  makeChart("compareChart",labels,datasets,
+    "Number of events X",undefined);
+
+  $("comparison").textContent=
+    "As λ increases from 2 to 6 to 10, the distribution shifts right, " +
+    "and its variance increases. The probability mass spreads across " +
+    "a wider range of event counts.";
+}
+
+/* Navigation */
+document.querySelectorAll("[data-page]").forEach(button=>{
+  button.addEventListener("click",()=>{
+    const page=button.dataset.page;
+
+    document.querySelectorAll("main section").forEach(section=>{
+      section.hidden=section.id!==page;
+    });
+
+    document.querySelectorAll("nav button").forEach(navButton=>{
+      navButton.classList.toggle("active",
+        navButton.dataset.page===page);
+    });
+
+    if(page==="binomial") updateBinomial();
+    if(page==="poisson") updatePoisson();
+  });
+});
+
+["bn","bp","bk"].forEach(id=>{
+  $(id).addEventListener("input",updateBinomial);
+});
+
+["pl","pk"].forEach(id=>{
+  $(id).addEventListener("input",updatePoisson);
+});
+
+updateBinomial();
+updatePoisson();
+</script>
+</body>
+</html>
+```
