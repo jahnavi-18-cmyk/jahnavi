@@ -1,0 +1,679 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Discrete Probability Distributions</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6fb;
+    color: #222b45;
+}
+
+header {
+    background: white;
+    padding: 18px 6%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+header h2 {
+    margin: 0;
+    font-size: 21px;
+}
+
+nav button {
+    padding: 10px 15px;
+    border: none;
+    background: white;
+    color: #333;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+nav button.active,
+nav button:hover {
+    background: #3157c8;
+    color: white;
+}
+
+main {
+    max-width: 1150px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+h1 {
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: #667085;
+    margin-bottom: 25px;
+}
+
+.card {
+    background: white;
+    padding: 22px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px #0000000b;
+}
+
+h2 {
+    font-size: 19px;
+    margin-top: 0;
+}
+
+.input-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+input {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #cbd2e1;
+    border-radius: 7px;
+    font-size: 16px;
+}
+
+#selectedValues {
+    margin-top: 15px;
+    color: #555;
+}
+
+.error {
+    color: #c62828;
+    margin-top: 10px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+}
+
+.stat {
+    background: #f0f3ff;
+    padding: 16px;
+    border-radius: 9px;
+    overflow-wrap: anywhere;
+}
+
+.stat p {
+    margin: 0 0 10px;
+    color: #555;
+    font-size: 13px;
+}
+
+.stat strong {
+    font-size: 21px;
+    color: #3157c8;
+}
+
+.calculator-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.formula {
+    background: #f6f7fb;
+    padding: 14px;
+    border-radius: 7px;
+    overflow-wrap: anywhere;
+}
+
+.result {
+    background: #edf2ff;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.result strong {
+    display: block;
+    color: #2342a4;
+    font-size: 22px;
+    margin-top: 7px;
+    overflow-wrap: anywhere;
+}
+
+.explanation {
+    color: #667085;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.chart-container {
+    position: relative;
+    height: 400px;
+}
+
+.placeholder {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+footer {
+    text-align: center;
+    color: #667085;
+    padding: 20px;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+@media (max-width: 800px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .input-grid,
+    .calculator-grid {
+        grid-template-columns: 1fr;
+    }
+
+    header {
+        padding: 15px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h2>Discrete Probability Distributions</h2>
+
+    <nav>
+        <button data-page="home">Home</button>
+        <button data-page="binomial" class="active">Binomial</button>
+        <button data-page="poisson">Poisson</button>
+        <button data-page="geometric">Geometric</button>
+    </nav>
+</header>
+
+<main>
+
+    <!-- HOME PAGE -->
+    <section id="home" class="page" hidden>
+        <h1>Discrete Probability Distributions</h1>
+        <p class="subtitle">
+            An educational application for the AIML laboratory.
+        </p>
+
+        <div class="card">
+            <h2>Available Distributions</h2>
+            <p>1. Binomial Distribution — Available</p>
+            <p>2. Poisson Distribution — Coming soon</p>
+            <p>3. Geometric Distribution — Coming soon</p>
+
+            <button data-page="binomial">Open Binomial</button>
+        </div>
+    </section>
+
+    <!-- BINOMIAL PAGE -->
+    <section id="binomial" class="page">
+
+        <h1>Binomial Distribution</h1>
+        <p class="subtitle">
+            Calculate probabilities and statistics for a binomial distribution.
+        </p>
+
+        <!-- INPUTS -->
+        <div class="card">
+            <h2>1. Distribution Inputs</h2>
+
+            <div class="input-grid">
+                <div>
+                    <label for="n">Number of trials (n)</label>
+                    <input type="number" id="n" min="1"
+                           step="1" value="20">
+                </div>
+
+                <div>
+                    <label for="p">Probability of success (p)</label>
+                    <input type="number" id="p" min="0"
+                           max="1" step="any" value="0.35">
+                </div>
+
+                <div>
+                    <label for="k">Number of successes (k)</label>
+                    <input type="number" id="k" min="0"
+                           step="1" value="7">
+                </div>
+            </div>
+
+            <p id="selectedValues">
+                Selected values: n = 20, p = 0.35
+            </p>
+
+            <p id="error" class="error" role="alert"></p>
+        </div>
+
+        <!-- STATISTICS -->
+        <div class="card">
+            <h2>2. Binomial Statistics</h2>
+
+            <div class="stats-grid">
+                <div class="stat">
+                    <p>Mean (np)</p>
+                    <strong id="mean">7</strong>
+                </div>
+
+                <div class="stat">
+                    <p>Variance</p>
+                    <strong id="variance">4.55</strong>
+                </div>
+
+                <div class="stat">
+                    <p>Standard Deviation</p>
+                    <strong id="sd">2.1331</strong>
+                </div>
+
+                <div class="stat">
+                    <p>Second Moment E[X²]</p>
+                    <strong id="second">53.55</strong>
+                </div>
+
+                <div class="stat">
+                    <p>Skewness</p>
+                    <strong id="skewness">0.1408</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="calculator-grid">
+
+            <!-- PMF -->
+            <div class="card">
+                <h2>3. PMF Calculator</h2>
+
+                <p class="explanation">
+                    PMF calculates the probability of exactly k successes.
+                </p>
+
+                <div class="formula">
+                    P(X = k) = C(n,k) p<sup>k</sup>
+                    (1-p)<sup>(n-k)</sup>
+                </div>
+
+                <div class="result">
+                    P(X = k)
+                    <strong id="pmf">—</strong>
+                </div>
+
+                <p class="explanation" id="pmfMeaning">
+                    This is the probability of getting exactly 7 successes.
+                </p>
+            </div>
+
+            <!-- CDF -->
+            <div class="card">
+                <h2>4. CDF Calculator</h2>
+
+                <p class="explanation">
+                    CDF calculates the probability of k or fewer successes.
+                </p>
+
+                <div class="result">
+                    P(X ≤ k)
+                    <strong id="cdf">—</strong>
+                </div>
+
+                <div class="result">
+                    P(X > k) = 1 − P(X ≤ k)
+                    <strong id="upper">—</strong>
+                </div>
+
+                <p class="explanation">
+                    P(X ≤ k) means the probability of getting k or fewer successes.
+                </p>
+            </div>
+
+        </div>
+
+        <!-- PMF GRAPH -->
+        <div class="card">
+            <h2>5. Binomial PMF Graph</h2>
+
+            <p class="explanation">
+                The graph displays P(X) for X = 0, 1, 2, ..., n.
+                Hover over a bar to see its probability.
+                The dashed vertical line represents the mean.
+            </p>
+
+            <div class="chart-container">
+                <canvas id="pmfChart"></canvas>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- POISSON PAGE -->
+    <section id="poisson" class="page" hidden>
+        <div class="card placeholder">
+            <h1>Poisson Distribution</h1>
+            <p>This module will be implemented later.</p>
+        </div>
+    </section>
+
+    <!-- GEOMETRIC PAGE -->
+    <section id="geometric" class="page" hidden>
+        <div class="card placeholder">
+            <h1>Geometric Distribution</h1>
+            <p>This module will be implemented later.</p>
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    Discrete Probability Distributions | AIML Laboratory
+</footer>
+
+<script>
+const nInput = document.getElementById("n");
+const pInput = document.getElementById("p");
+const kInput = document.getElementById("k");
+
+let chart = null;
+
+/* Format numbers */
+function format(value, digits = 8) {
+    if (!Number.isFinite(value)) return "—";
+
+    return value.toLocaleString("en-US", {
+        maximumFractionDigits: digits
+    });
+}
+
+/* Calculate binomial probability */
+function binomialPMF(n, k, p) {
+    if (k < 0 || k > n) return 0;
+
+    if (p === 0) return k === 0 ? 1 : 0;
+    if (p === 1) return k === n ? 1 : 0;
+
+    let probability = 1;
+
+    for (let i = 1; i <= k; i++) {
+        probability *= (n - i + 1) / i;
+    }
+
+    return probability *
+           Math.pow(p, k) *
+           Math.pow(1 - p, n - k);
+}
+
+/* Validate inputs */
+function validate() {
+    const n = Number(nInput.value);
+    const p = Number(pInput.value);
+    const k = Number(kInput.value);
+
+    if (nInput.value.trim() === "" ||
+        !Number.isInteger(n) || n < 1) {
+        return "n must be a positive integer.";
+    }
+
+    if (n > 1000) {
+        return "Please enter n ≤ 1000 for the graph.";
+    }
+
+    if (pInput.value.trim() === "" ||
+        !Number.isFinite(p) || p < 0 || p > 1) {
+        return "p must be between 0 and 1, inclusive.";
+    }
+
+    if (kInput.value.trim() === "" ||
+        !Number.isInteger(k) || k < 0 || k > n) {
+        return "k must be an integer between 0 and n.";
+    }
+
+    return "";
+}
+
+/* Update all calculations */
+function calculate() {
+    const error = validate();
+
+    document.getElementById("error").textContent = error;
+
+    if (error) {
+        document.getElementById("selectedValues").textContent =
+            "Please correct the inputs.";
+
+        ["mean", "variance", "sd", "second",
+         "skewness", "pmf", "cdf", "upper"].forEach(id => {
+            document.getElementById(id).textContent = "—";
+        });
+
+        if (chart) {
+            chart.destroy();
+            chart = null;
+        }
+
+        return;
+    }
+
+    const n = Number(nInput.value);
+    const p = Number(pInput.value);
+    const k = Number(kInput.value);
+
+    document.getElementById("selectedValues").textContent =
+        `Selected values: n = ${n}, p = ${p}`;
+
+    kInput.max = n;
+
+    /* Statistics */
+    const mean = n * p;
+    const variance = n * p * (1 - p);
+    const sd = Math.sqrt(variance);
+    const second = variance + mean * mean;
+
+    const skewness = variance === 0
+        ? 0
+        : (1 - 2 * p) / Math.sqrt(variance);
+
+    document.getElementById("mean").textContent = format(mean);
+    document.getElementById("variance").textContent = format(variance);
+    document.getElementById("sd").textContent = format(sd);
+    document.getElementById("second").textContent = format(second);
+    document.getElementById("skewness").textContent = format(skewness);
+
+    /* PMF */
+    const pmf = binomialPMF(n, k, p);
+
+    document.getElementById("pmf").textContent = format(pmf, 12);
+
+    document.getElementById("pmfMeaning").textContent =
+        `This is the probability of getting exactly ${k} successes in ${n} trials.`;
+
+    /* CDF */
+    let cdf = 0;
+
+    for (let x = 0; x <= k; x++) {
+        cdf += binomialPMF(n, x, p);
+    }
+
+    cdf = Math.max(0, Math.min(1, cdf));
+
+    document.getElementById("cdf").textContent = format(cdf, 12);
+    document.getElementById("upper").textContent =
+        format(Math.max(0, 1 - cdf), 12);
+
+    /* Chart data */
+    drawChart(n, p, mean);
+}
+
+/* Draw or update PMF graph */
+function drawChart(n, p, mean) {
+    const labels = [];
+    const probabilities = [];
+
+    for (let x = 0; x <= n; x++) {
+        labels.push(x);
+        probabilities.push(binomialPMF(n, x, p));
+    }
+
+    if (chart) {
+        chart.destroy();
+    }
+
+    chart = new Chart(document.getElementById("pmfChart"), {
+        type: "bar",
+
+        data: {
+            labels: labels,
+
+            datasets: [{
+                label: "P(X = x)",
+                data: probabilities,
+                backgroundColor: "rgba(49, 87, 200, 0.75)",
+                borderColor: "#3157c8",
+                borderWidth: 1
+            }]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: {
+                    display: false
+                },
+
+                tooltip: {
+                    callbacks: {
+                        title: items => `X = ${items[0].label}`,
+
+                        label: item =>
+                            `P(X=${item.label}) = ${
+                                Number(item.raw).toPrecision(8)
+                            }`
+                    }
+                }
+            },
+
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: "Number of successes X"
+                    },
+
+                    ticks: {
+                        autoSkip: true,
+                        maxTicksLimit: 25
+                    }
+                },
+
+                y: {
+                    beginAtZero: true,
+
+                    title: {
+                        display: true,
+                        text: "Probability P(X)"
+                    }
+                }
+            }
+        },
+
+        plugins: [{
+            id: "meanReferenceLine",
+
+            afterDatasetsDraw(chartInstance) {
+                const xScale = chartInstance.scales.x;
+                const yScale = chartInstance.scales.y;
+
+                // Place the reference line at the numerical mean,
+                // including when the mean is not an integer.
+                const xPixel = xScale.getPixelForValue(mean);
+                const area = chartInstance.chartArea;
+                const ctx = chartInstance.ctx;
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.setLineDash([7, 5]);
+                ctx.strokeStyle = "#d35400";
+                ctx.lineWidth = 2;
+                ctx.moveTo(xPixel, area.top);
+                ctx.lineTo(xPixel, area.bottom);
+                ctx.stroke();
+
+                ctx.setLineDash([]);
+                ctx.fillStyle = "#d35400";
+                ctx.font = "12px Arial";
+                ctx.fillText(
+                    "Mean = " + mean.toFixed(2),
+                    Math.min(xPixel + 5, area.right - 90),
+                    area.top + 15
+                );
+
+                ctx.restore();
+            }
+        }]
+    });
+}
+
+/* Update when inputs change */
+[nInput, pInput, kInput].forEach(input => {
+    input.addEventListener("input", calculate);
+});
+
+/* Navigation */
+document.querySelectorAll("[data-page]").forEach(button => {
+    button.addEventListener("click", () => {
+        const page = button.dataset.page;
+
+        document.querySelectorAll(".page").forEach(section => {
+            section.hidden = section.id !== page;
+        });
+
+        document.querySelectorAll("nav button").forEach(navButton => {
+            navButton.classList.toggle(
+                "active",
+                navButton.dataset.page === page
+            );
+        });
+
+        if (page === "binomial") {
+            calculate();
+        }
+    });
+});
+
+/* Initial calculations */
+calculate();
+</script>
+
+</body>
+</html>
+```
