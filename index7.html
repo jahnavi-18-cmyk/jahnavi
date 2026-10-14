@@ -1,0 +1,190 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Poisson Distribution Lab</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f0f4f8;
+    margin: 0;
+    padding: 20px;
+}
+.container {
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px #0002;
+}
+h1, h2 { color: #6a1b9a; }
+.input-group { margin: 15px 0; }
+label { font-weight: bold; }
+input {
+    padding: 9px;
+    width: 100%;
+    max-width: 250px;
+    margin-top: 6px;
+    box-sizing: border-box;
+}
+button {
+    background: #6a1b9a;
+    color: white;
+    border: none;
+    padding: 11px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+button:hover { background: #4a116c; }
+.results {
+    background: #f3e5f5;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 20px;
+    line-height: 1.9;
+}
+canvas { margin-top: 20px; }
+.inference {
+    background: #e8f5e9;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Poisson Distribution</h1>
+<p>Analyze the number of events occurring in a fixed interval.</p>
+
+<div class="input-group">
+<label for="lambda">Average event rate (&lambda;):</label><br>
+<input type="number" id="lambda" value="6" min="0" max="30" step="0.1">
+</div>
+
+<button onclick="calculate()">Calculate Distribution</button>
+
+<div class="results" id="results"></div>
+
+<h2>Poisson PMF Comparison</h2>
+<p>Compare the distributions for &lambda; = 2, 6, and 10.</p>
+<canvas id="pmfChart"></canvas>
+
+<div class="inference" id="inference"></div>
+</div>
+
+<script>
+let chart;
+
+function poissonPMF(lambda, x) {
+    let probability = Math.exp(-lambda);
+    for (let i = 1; i <= x; i++) {
+        probability *= lambda / i;
+    }
+    return probability;
+}
+
+function calculate() {
+    const lambda = Number(document.getElementById("lambda").value);
+
+    if (!Number.isFinite(lambda) || lambda < 0 || lambda > 30) {
+        alert("Enter a value of lambda between 0 and 30.");
+        return;
+    }
+
+    const mean = lambda;
+    const variance = lambda;
+    const p8 = poissonPMF(lambda, 8);
+
+    let pAtMost5 = 0;
+    for (let x = 0; x <= 5; x++) {
+        pAtMost5 += poissonPMF(lambda, x);
+    }
+
+    document.getElementById("results").innerHTML = `
+        <h2>Results</h2>
+        Mean = &lambda; = <b>${mean.toFixed(4)}</b><br>
+        Variance = &lambda; = <b>${variance.toFixed(4)}</b><br>
+        P(X = 8) = <b>${p8.toFixed(6)}</b>
+        (${(p8*100).toFixed(2)}%)<br>
+        P(X &le; 5) = <b>${pAtMost5.toFixed(6)}</b>
+        (${(pAtMost5*100).toFixed(2)}%)
+    `;
+
+    const maxX = Math.min(30, Math.max(20, Math.ceil(lambda + 5*Math.sqrt(lambda))));
+    const labels = Array.from({length: maxX+1}, (_, i) => i);
+    const rates = [2, 6, 10];
+
+    const datasets = rates.map((rate, index) => ({
+        label: `Lambda = ${rate}`,
+        data: labels.map(x => poissonPMF(rate, x)),
+        borderColor: ["#4285f4", "#34a853", "#ea4335"][index],
+        backgroundColor: ["#4285f4", "#34a853", "#ea4335"][index],
+        borderWidth: 2,
+        pointRadius: 2,
+        tension: 0.2
+    }));
+
+    // Add the user-selected distribution if it is not one
+    // of the three standard comparison values.
+    if (!rates.includes(lambda)) {
+        datasets.push({
+            label: `Selected Lambda = ${lambda}`,
+            data: labels.map(x => poissonPMF(lambda, x)),
+            borderColor: "#8e24aa",
+            backgroundColor: "#8e24aa",
+            borderWidth: 3,
+            pointRadius: 2,
+            tension: 0.2
+        });
+    }
+
+    if (chart) chart.destroy();
+
+    chart = new Chart(document.getElementById("pmfChart"), {
+        type: "line",
+        data: { labels, datasets },
+        options: {
+            responsive: true,
+            interaction: {
+                mode: "index",
+                intersect: false
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: "Number of events (x)"
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: "Probability P(X = x)"
+                    }
+                }
+            }
+        }
+    });
+
+    document.getElementById("inference").innerHTML = `
+        <h2>Inference</h2>
+        For the selected &lambda; = ${lambda},
+        the mean and variance are both ${lambda}.
+        P(X = 8) is ${(p8*100).toFixed(2)}% and
+        P(X &le; 5) is ${(pAtMost5*100).toFixed(2)}%.
+        As &lambda; increases, the PMF shifts toward larger event
+        counts and becomes more spread out.
+    `;
+}
+
+calculate();
+</script>
+</body>
+</html>
+```
