@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Continuous Probability Distributions</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f4f6fb;
+            color: #1e293b;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 22px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        header h1 {
+            font-size: 22px;
+        }
+
+        header span {
+            color: #93c5fd;
+        }
+
+        nav {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        nav button {
+            background: transparent;
+            color: white;
+            border: 1px solid #64748b;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        nav button:hover {
+            background: #2563eb;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: auto;
+            padding: 35px 20px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #1e3a8a, #4338ca);
+            color: white;
+            padding: 45px;
+            border-radius: 18px;
+            margin-bottom: 30px;
+        }
+
+        .hero h2 {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .hero p {
+            line-height: 1.7;
+            max-width: 700px;
+        }
+
+        .modules {
+            display: grid;
+            grid-template-columns: repeat(
+                auto-fit, minmax(260px, 1fr)
+            );
+            gap: 22px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px #00000008;
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px #00000012;
+        }
+
+        .card .icon {
+            font-size: 35px;
+            margin-bottom: 15px;
+        }
+
+        .card h3 {
+            margin-bottom: 12px;
+            color: #1e3a8a;
+        }
+
+        .card p {
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background: #2563eb;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            background: #1d4ed8;
+        }
+
+        .module-page {
+            display: none;
+        }
+
+        .module-page.active {
+            display: block;
+        }
+
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px #00000005;
+        }
+
+        .section h3 {
+            color: #1e3a8a;
+            margin-bottom: 15px;
+        }
+
+        .section p,
+        .section li {
+            line-height: 1.8;
+            color: #475569;
+        }
+
+        .formula {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            font-size: 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(
+                auto-fit, minmax(200px, 1fr)
+            );
+            gap: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+        }
+
+        .placeholder {
+            border: 2px dashed #cbd5e1;
+            background: #f8fafc;
+            padding: 35px;
+            border-radius: 10px;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .back {
+            margin-bottom: 25px;
+            background: #475569;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #64748b;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                padding: 20px;
+            }
+
+            .hero {
+                padding: 25px;
+            }
+
+            .hero h2 {
+                font-size: 25px;
+            }
+
+            nav button {
+                padding: 8px 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>📊 <span>Prob</span>Learn</h1>
+
+    <nav>
+        <button onclick="showHome()">Home</button>
+        <button onclick="showModule('normal')">Normal</button>
+        <button onclick="showModule('exponential')">Exponential</button>
+        <button onclick="showModule('clt')">CLT</button>
+    </nav>
+</header>
+
+<main>
+
+    <!-- HOME PAGE -->
+
+    <section id="home">
+
+        <div class="hero">
+            <h2>Continuous Probability Distributions</h2>
+
+            <p>
+                Industry Applications for Undergraduate AIML Students.
+                Discover how probability distributions solve real-world
+                problems in manufacturing, cloud computing, and warehouse
+                operations through interactive learning.
+            </p>
+        </div>
+
+        <h2 style="margin-bottom:20px;">Explore Learning Modules</h2>
+
+        <div class="modules">
+
+            <div class="card">
+                <div class="icon">🏭</div>
+
+                <h3>Normal Distribution</h3>
+
+                <p>
+                    Manufacturing Quality Control.
+                    Understand how product dimensions vary
+                    and how factories identify defective products.
+                </p>
+
+                <button class="btn"
+                    onclick="showModule('normal')">
+                    Explore Module →
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="icon">☁️</div>
+
+                <h3>Exponential Distribution</h3>
+
+                <p>
+                    Cloud Request Inter-arrival Time.
+                    Explore the waiting time between incoming
+                    requests to cloud servers.
+                </p>
+
+                <button class="btn"
+                    onclick="showModule('exponential')">
+                    Explore Module →
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="icon">📦</div>
+
+                <h3>Central Limit Theorem</h3>
+
+                <p>
+                    Warehouse Processing Time.
+                    Understand how sample averages help
+                    estimate warehouse processing performance.
+                </p>
+
+                <button class="btn"
+                    onclick="showModule('clt')">
+                    Explore Module →
+                </button>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- NORMAL DISTRIBUTION -->
+
+    <section id="normal" class="module-page">
+
+        <button class="btn back" onclick="showHome()">
+            ← Back to Home
+        </button>
+
+        <h2>🏭 Normal Distribution</h2>
+        <p style="margin:15px 0 25px;">
+            Manufacturing Quality Control
+        </p>
+
+        <div class="section">
+            <h3>1. Industry Problem</h3>
+
+            <p>
+                A factory manufactures metal rods with a target length.
+                Due to small manufacturing variations, the actual length
+                of each rod may differ slightly. The normal distribution
+                helps engineers understand these variations and identify
+                products that do not meet quality standards.
+            </p>
+        </div>
+
+        <div class="section">
+            <h3>2. Learning Objectives</h3>
+
+            <ul>
+                <li>Understand the bell-shaped probability curve.</li>
+                <li>Learn the role of mean and standard deviation.</li>
+                <li>Understand manufacturing tolerances.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>3. Input Parameters</h3>
+
+            <div class="input-grid">
+                <div>
+                    <label>Mean Length (μ)</label>
+                    <input type="number" value="100">
+                </div>
+
+                <div>
+                    <label>Standard Deviation (σ)</label>
+                    <input type="number" value="2">
+                </div>
+
+                <div>
+                    <label>Rod Length (x)</label>
+                    <input type="number" value="102">
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>4. Mathematical Formula</h3>
+
+            <div class="formula">
+                f(x) = 1 / (σ√2π) ×
+                e<sup>−(x−μ)² / 2σ²</sup>
+            </div>
+
+            <p>
+                μ = Mean, σ = Standard deviation,
+                x = Observed rod length.
+            </p>
+        </div>
+
+        <div class="section">
+            <h3>5. Interactive Calculation</h3>
+
+            <div class="placeholder">
+                Calculation results will appear here.
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>6. Dynamic Visualization</h3>
+
+            <div class="placeholder">
+                📈 Normal Distribution Curve Placeholder
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>7. Interpretation</h3>
+
+            <div class="placeholder">
+                The application will explain the probability
+                and manufacturing quality results here.
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- EXPONENTIAL DISTRIBUTION -->
+
+    <section id="exponential" class="module-page">
+
+        <button class="btn back" onclick="showHome()">
+            ← Back to Home
+        </button>
+
+        <h2>☁️ Exponential Distribution</h2>
+        <p style="margin:15px 0 25px;">
+            Cloud Request Inter-arrival Time
+        </p>
+
+        <div class="section">
+            <h3>1. Industry Problem</h3>
+
+            <p>
+                A cloud server receives requests from multiple users.
+                The exponential distribution models the waiting time
+                between consecutive requests and helps engineers
+                understand server traffic patterns.
+            </p>
+        </div>
+
+        <div class="section">
+            <h3>2. Learning Objectives</h3>
+
+            <ul>
+                <li>Understand the exponential probability distribution.</li>
+                <li>Learn the meaning of the arrival rate.</li>
+                <li>Understand waiting time between requests.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>3. Input Parameters</h3>
+
+            <div class="input-grid">
+                <div>
+                    <label>Request Rate (λ)</label>
+                    <input type="number" value="5">
+                </div>
+
+                <div>
+                    <label>Waiting Time (x)</label>
+                    <input type="number" value="0.5">
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>4. Mathematical Formula</h3>
+
+            <div class="formula">
+                f(x) = λe<sup>−λx</sup>, x ≥ 0
+            </div>
+
+            <p>
+                λ = Average request arrival rate,
+                x = Time between requests.
+            </p>
+        </div>
+
+        <div class="section">
+            <h3>5. Interactive Calculation</h3>
+
+            <div class="placeholder">
+                Calculation results will appear here.
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>6. Dynamic Visualization</h3>
+
+            <div class="placeholder">
+                📉 Exponential Distribution Curve Placeholder
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>7. Interpretation</h3>
+
+            <div class="placeholder">
+                The application will explain the waiting time
+                and cloud request probability here.
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- CENTRAL LIMIT THEOREM -->
+
+    <section id="clt" class="module-page">
+
+        <button class="btn back" onclick="showHome()">
+            ← Back to Home
+        </button>
+
+        <h2>📦 Central Limit Theorem</h2>
+        <p style="margin:15px 0 25px;">
+            Warehouse Processing Time
+        </p>
+
+        <div class="section">
+            <h3>1. Industry Problem</h3>
+
+            <p>
+                A warehouse processes customer orders.
+                Each order takes a different amount of time.
+                The Central Limit Theorem explains how the
+                average processing time of repeated samples
+                tends to follow a normal distribution.
+            </p>
+        </div>
+
+        <div class="section">
+            <h3>2. Learning Objectives</h3>
+
+            <ul>
+                <li>Understand sample means.</li>
+                <li>Learn the importance of sample size.</li>
+                <li>Understand the sampling distribution.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>3. Input Parameters</h3>
+
+            <div class="input-grid">
+                <div>
+                    <label>Population Mean (μ)</label>
+                    <input type="number" value="30">
+                </div>
+
+                <div>
+                    <label>Population Standard Deviation (σ)</label>
+                    <input type="number" value="8">
+                </div>
+
+                <div>
+                    <label>Sample Size (n)</label>
+                    <input type="number" value="30">
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>4. Mathematical Formula</h3>
+
+            <div class="formula">
+                Z = (X̄ − μ) / (σ / √n)
+            </div>
+
+            <p>
+                X̄ = Sample mean,
+                μ = Population mean,
+                σ = Population standard deviation,
+                n = Sample size.
+            </p>
+        </div>
+
+        <div class="section">
+            <h3>5. Interactive Calculation</h3>
+
+            <div class="placeholder">
+                Calculation results will appear here.
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>6. Dynamic Visualization</h3>
+
+            <div class="placeholder">
+                📊 Sampling Distribution Curve Placeholder
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>7. Interpretation</h3>
+
+            <div class="placeholder">
+                The application will explain how sample size
+                affects warehouse processing time estimates.
+            </div>
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+    <p>
+        Continuous Probability Distributions |
+        AIML Educational Project
+    </p>
+</footer>
+
+<script>
+
+    function showHome() {
+
+        document.getElementById("home").style.display = "block";
+
+        document.querySelectorAll(".module-page").forEach(
+            page => page.classList.remove("active")
+        );
+
+        window.scrollTo(0, 0);
+    }
+
+    function showModule(moduleId) {
+
+        document.getElementById("home").style.display = "none";
+
+        document.querySelectorAll(".module-page").forEach(
+            page => page.classList.remove("active")
+        );
+
+        document.getElementById(moduleId).classList.add("active");
+
+        window.scrollTo(0, 0);
+    }
+
+</script>
+
+</body>
+</html>
