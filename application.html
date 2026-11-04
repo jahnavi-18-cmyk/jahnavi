@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Continuous Probability Distributions</title>
+
+    <!-- Chart.js for probability visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f6fc;
+            color: #1e293b;
+        }
+
+        header {
+            background: linear-gradient(135deg, #172554, #2563eb);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        header p {
+            margin-top: 10px;
+            color: #dbeafe;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 25px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #1d4ed8;
+            margin-top: 0;
+        }
+
+        .problem {
+            line-height: 1.7;
+            color: #475569;
+        }
+
+        .inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 18px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        input:focus {
+            outline: 2px solid #60a5fa;
+            border-color: #2563eb;
+        }
+
+        .formula {
+            background: #eff6ff;
+            padding: 18px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 20px;
+            margin-top: 15px;
+            line-height: 1.8;
+        }
+
+        .results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .result-box {
+            background: #f8fafc;
+            border-left: 5px solid #2563eb;
+            border-radius: 8px;
+            padding: 18px;
+        }
+
+        .result-box h3 {
+            font-size: 14px;
+            color: #64748b;
+            margin: 0 0 10px;
+        }
+
+        .result-box p {
+            font-size: 23px;
+            font-weight: bold;
+            margin: 0;
+            color: #1e40af;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 420px;
+        }
+
+        .interpretation {
+            background: #ecfdf5;
+            border-left: 5px solid #10b981;
+            padding: 20px;
+            border-radius: 8px;
+            line-height: 1.8;
+        }
+
+        .error {
+            color: #dc2626;
+            font-weight: bold;
+            margin-top: 12px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+        }
+
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 22px;
+            }
+
+            .chart-container {
+                height: 320px;
+            }
+
+            .formula {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Continuous Probability Distributions</h1>
+    <p>Industry Applications | AIML Educational Project</p>
+</header>
+
+<div class="container">
+
+    <!-- Problem Statement -->
+    <section class="card">
+        <h2>Normal Distribution — Manufacturing Quality Control</h2>
+
+        <p class="problem">
+            A manufacturing company produces metal shafts with a target
+            diameter of 10 mm. Due to manufacturing variations, the actual
+            diameter follows a normal distribution.
+            <br><br>
+            The company accepts shafts between 9.90 mm and 10.10 mm.
+            Shafts outside these limits are considered defective.
+            <br><br>
+            Use probability calculations to estimate the percentage
+            of acceptable and defective products.
+        </p>
+    </section>
+
+    <!-- Input Parameters -->
+    <section class="card">
+        <h2>Input Parameters</h2>
+
+        <div class="inputs">
+
+            <div>
+                <label for="mu">Mean diameter (μ) in mm</label>
+                <input type="number" id="mu"
+                       value="10" step="0.01">
+            </div>
+
+            <div>
+                <label for="sigma">Standard deviation (σ) in mm</label>
+                <input type="number" id="sigma"
+                       value="0.05" step="0.01" min="0.0001">
+            </div>
+
+            <div>
+                <label for="lsl">Lower specification limit (mm)</label>
+                <input type="number" id="lsl"
+                       value="9.90" step="0.01">
+            </div>
+
+            <div>
+                <label for="usl">Upper specification limit (mm)</label>
+                <input type="number" id="usl"
+                       value="10.10" step="0.01">
+            </div>
+
+            <div>
+                <label for="x">Selected diameter (mm)</label>
+                <input type="number" id="x"
+                       value="10" step="0.01">
+            </div>
+
+        </div>
+
+        <div id="error" class="error"></div>
+    </section>
+
+    <!-- Mathematical Formula -->
+    <section class="card">
+        <h2>Mathematical Formula</h2>
+
+        <div class="formula">
+            <strong>Normal Probability Density Function</strong>
+            <br>
+            f(x) =
+            1 / (σ√(2π)) ×
+            e<sup>−(x−μ)² / (2σ²)</sup>
+            <br><br>
+
+            <strong>Standardization</strong>
+            <br>
+            Z = (X − μ) / σ
+            <br><br>
+
+            <strong>Interval Probability</strong>
+            <br>
+            P(a ≤ X ≤ b) = Φ(z<sub>b</sub>) − Φ(z<sub>a</sub>)
+        </div>
+    </section>
+
+    <!-- Probability Graph -->
+    <section class="card">
+        <h2>Interactive Probability Graph</h2>
+
+        <p class="problem">
+            The bell-shaped curve represents the probability density.
+            The green region represents acceptable products.
+            The red regions represent defective products.
+        </p>
+
+        <div class="chart-container">
+            <canvas id="normalChart"></canvas>
+        </div>
+    </section>
+
+    <!-- Results -->
+    <section class="card">
+        <h2>Probability Calculations</h2>
+
+        <div class="results">
+
+            <div class="result-box">
+                <h3>Density at Selected Diameter</h3>
+                <p id="density">—</p>
+                <small>Per mm</small>
+            </div>
+
+            <div class="result-box">
+                <h3>Acceptable Products</h3>
+                <p id="acceptable">—</p>
+                <small>Probability within limits</small>
+            </div>
+
+            <div class="result-box">
+                <h3>Below Lower Limit</h3>
+                <p id="below">—</p>
+                <small>Lower defective region</small>
+            </div>
+
+            <div class="result-box">
+                <h3>Above Upper Limit</h3>
+                <p id="above">—</p>
+                <small>Upper defective region</small>
+            </div>
+
+            <div class="result-box">
+                <h3>Total Defective Products</h3>
+                <p id="defective">—</p>
+                <small>Expected defect percentage</small>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Interpretation -->
+    <section class="card">
+        <h2>Quality Control Interpretation</h2>
+
+        <div class="interpretation" id="interpretation">
+            Calculating results...
+        </div>
+    </section>
+
+</div>
+
+<footer>
+    Continuous Probability Distributions | AIML Project
+</footer>
+
+<script>
+
+    // ---------------------------------------
+    // 1. Normal Probability Density Function
+    // ---------------------------------------
+
+    function normalPDF(x, mu, sigma) {
+
+        const coefficient =
+            1 / (sigma * Math.sqrt(2 * Math.PI));
+
+        const exponent =
+            -Math.pow(x - mu, 2) /
+            (2 * Math.pow(sigma, 2));
+
+        return coefficient * Math.exp(exponent);
+    }
+
+
+    // ---------------------------------------
+    // 2. Error Function Approximation
+    // ---------------------------------------
+
+    function erf(x) {
+
+        const sign = x < 0 ? -1 : 1;
+
+        x = Math.abs(x);
+
+        const a1 = 0.254829592;
+        const a2 = -0.284496736;
+        const a3 = 1.421413741;
+        const a4 = -1.453152027;
+        const a5 = 1.061405429;
+        const p = 0.3275911;
+
+        const t = 1 / (1 + p * x);
+
+        const y = 1 -
+            (((((a5 * t + a4) * t + a3) * t + a2)
+            * t + a1) * t) * Math.exp(-x * x);
+
+        return sign * y;
+    }
+
+
+    // ---------------------------------------
+    // 3. Normal Cumulative Distribution
+    // ---------------------------------------
+
+    function normalCDF(x, mu, sigma) {
+
+        const z = (x - mu) / sigma;
+
+        return 0.5 * (
+            1 + erf(z / Math.sqrt(2))
+        );
+    }
+
+
+    // ---------------------------------------
+    // 4. Create Chart
+    // ---------------------------------------
+
+    const ctx = document
+        .getElementById("normalChart")
+        .getContext("2d");
+
+    const chart = new Chart(ctx, {
+
+        type: "line",
+
+        data: {
+
+            datasets: [
+
+                {
+                    label: "Below Lower Limit",
+                    data: [],
+                    borderColor: "#ef4444",
+                    backgroundColor: "rgba(239,68,68,0.35)",
+                    fill: "origin",
+                    pointRadius: 0,
+                    borderWidth: 2
+                },
+
+                {
+                    label: "Acceptable Region",
+                    data: [],
+                    borderColor: "#16a34a",
+                    backgroundColor: "rgba(34,197,94,0.35)",
+                    fill: "origin",
+                    pointRadius: 0,
+                    borderWidth: 2
+                },
+
+                {
+                    label: "Above Upper Limit",
+                    data: [],
+                    borderColor: "#ef4444",
+                    backgroundColor: "rgba(239,68,68,0.35)",
+                    fill: "origin",
+                    pointRadius: 0,
+                    borderWidth: 2
+                },
+
+                {
+                    label: "Normal Distribution",
+                    data: [],
+                    borderColor: "#2563eb",
+                    backgroundColor: "transparent",
+                    fill: false,
+                    pointRadius: 0,
+                    borderWidth: 3
+                },
+
+                {
+                    label: "Selected Diameter",
+                    data: [],
+                    borderColor: "#f59e0b",
+                    backgroundColor: "#f59e0b",
+                    pointRadius: 5,
+                    showLine: false
+                }
+
+            ]
+
+        },
+
+        options: {
+
+            responsive: true,
+            maintainAspectRatio: false,
+
+            interaction: {
+                intersect: false,
+                mode: "nearest"
+            },
+
+            plugins: {
+
+                legend: {
+                    position: "bottom"
+                },
+
+                tooltip: {
+                    callbacks: {
+
+                        label: function(context) {
+
+                            return "Density: " +
+                                context.parsed.y.toFixed(5);
+                        }
+
+                    }
+                }
+
+            },
+
+            scales: {
+
+                x: {
+
+                    type: "linear",
+
+                    title: {
+                        display: true,
+                        text: "Shaft Diameter (mm)"
+                    }
+
+                },
+
+                y: {
+
+                    beginAtZero: true,
+
+                    title: {
+                        display: true,
+                        text: "Probability Density"
+                    }
+
+                }
+
+            }
+
+        }
+
+    });
+
+
+    // ---------------------------------------
+    // 5. Update Application
+    // ---------------------------------------
+
+    function updateApp() {
+
+        const mu = Number(
+            document.getElementById("mu").value
+        );
+
+        const sigma = Number(
+            document.getElementById("sigma").value
+        );
+
+        const lsl = Number(
+            document.getElementById("lsl").value
+        );
+
+        const usl = Number(
+            document.getElementById("usl").value
+        );
+
+        const x = Number(
+            document.getElementById("x").value
+        );
+
+        const errorElement =
+            document.getElementById("error");
+
+        errorElement.textContent = "";
+
+
+        // Input validation
+
+        if (
+            !Number.isFinite(mu) ||
+            !Number.isFinite(sigma) ||
+            !Number.isFinite(lsl) ||
+            !Number.isFinite(usl) ||
+            !Number.isFinite(x)
+        ) {
+
+            errorElement.textContent =
+                "Please enter valid numerical values.";
+
+            return;
+        }
+
+        if (sigma <= 0) {
+
+            errorElement.textContent =
+                "Standard deviation must be positive.";
+
+            return;
+        }
+
+        if (lsl >= usl) {
+
+            errorElement.textContent =
+                "Lower limit must be less than upper limit.";
+
+            return;
+        }
+
+
+        // -----------------------------------
+        // Probability Calculations
+        // -----------------------------------
+
+        const density = normalPDF(x, mu, sigma);
+
+        const pBelow = normalCDF(lsl, mu, sigma);
+
+        const pAbove =
+            1 - normalCDF(usl, mu, sigma);
+
+        const pAcceptable =
+            normalCDF(usl, mu, sigma) -
+            normalCDF(lsl, mu, sigma);
+
+        const pDefective = pBelow + pAbove;
+
+
+        // -----------------------------------
+        // Display Results
+        // -----------------------------------
+
+        document.getElementById("density")
+            .textContent = density.toFixed(5);
+
+        document.getElementById("acceptable")
+            .textContent =
+            (pAcceptable * 100).toFixed(4) + "%";
+
+        document.getElementById("below")
+            .textContent =
+            (pBelow * 100).toFixed(4) + "%";
+
+        document.getElementById("above")
+            .textContent =
+            (pAbove * 100).toFixed(4) + "%";
+
+        document.getElementById("defective")
+            .textContent =
+            (pDefective * 100).toFixed(4) + "%";
+
+
+        // -----------------------------------
+        // Dynamic Graph Data
+        // -----------------------------------
+
+        const minX = Math.min(
+            mu - 4 * sigma,
+            lsl - sigma,
+            x - sigma
+        );
+
+        const maxX = Math.max(
+            mu + 4 * sigma,
+            usl + sigma,
+            x + sigma
+        );
+
+        const totalPoints = 400;
+
+        const allPoints = [];
+
+        for (let i = 0; i <= totalPoints; i++) {
+
+            const value = minX +
+                (maxX - minX) *
+                i / totalPoints;
+
+            allPoints.push({
+
+                x: value,
+
+                y: normalPDF(
+                    value,
+                    mu,
+                    sigma
+                )
+
+            });
+
+        }
+
+
+        // Split curve into shaded regions
+
+        const belowData = allPoints.filter(
+            point => point.x <= lsl
+        );
+
+        const acceptableData = allPoints.filter(
+            point =>
+                point.x >= lsl &&
+                point.x <= usl
+        );
+
+        const aboveData = allPoints.filter(
+            point => point.x >= usl
+        );
+
+
+        // -----------------------------------
+        // Update Graph
+        // -----------------------------------
+
+        chart.data.datasets[0].data = belowData;
+
+        chart.data.datasets[1].data = acceptableData;
+
+        chart.data.datasets[2].data = aboveData;
+
+        chart.data.datasets[3].data = allPoints;
+
+        chart.data.datasets[4].data = [
+
+            {
+                x: x,
+                y: density
+            }
+
+        ];
+
+        chart.update();
+
+
+        // -----------------------------------
+        // Interpretation
+        // -----------------------------------
+
+        const interpretation =
+            `The manufacturing process produces approximately
+            ${(pAcceptable * 100).toFixed(2)}% acceptable shafts.
+            <br><br>
+            Approximately ${(pDefective * 100).toFixed(2)}%
+            of shafts are expected to be defective.
+            <br><br>
+            Out of 10,000 manufactured shafts, around
+            ${Math.round(pDefective * 10000)}
+            shafts may fall outside the specification limits.
+            <br><br>
+            ${pAcceptable >= 0.99
+                ? "The process has a high acceptance rate."
+                : "The process may need better quality control."}`;
+
+        document.getElementById("interpretation")
+            .innerHTML = interpretation;
+
+    }
+
+
+    // ---------------------------------------
+    // 6. Live Input Event Listeners
+    // ---------------------------------------
+
+    document.querySelectorAll("input")
+        .forEach(input => {
+
+            input.addEventListener(
+                "input",
+                updateApp
+            );
+
+        });
+
+
+    // Initial Calculation
+
+    updateApp();
+
+</script>
+
+</body>
+</html>
